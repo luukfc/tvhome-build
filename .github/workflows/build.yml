@@ -1,0 +1,29 @@
+name: Build CleanYourTV launcher
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out upstream source
+        uses: actions/checkout@v4
+        with:
+          repository: Gathin23/cleanyourtv
+          path: src
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build launcher APK
+        run: |
+          cd src/launcher
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --console=plain
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tvhome-launcher
+          path: src/launcher/app/build/outputs/apk/release/app-release.apk
