@@ -3,11 +3,14 @@ name: Build CleanYourTV launcher
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out upstream source
+      - name: Check out CleanYourTV source
         uses: actions/checkout@v4
         with:
           repository: Gathin23/cleanyourtv
@@ -17,13 +20,18 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Build launcher APK
+      - name: Build launcher APK with Xiaomi allowlist identity
         run: |
           cd src/launcher
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon --console=plain
-      - name: Upload APK
+          ./gradlew assembleRelease -PlauncherApplicationId=com.ts.launcher --no-daemon
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tvhome-launcher
+          name: tvhome-launcher-ts
           path: src/launcher/app/build/outputs/apk/release/app-release.apk
+      - name: Publish release with APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "launcher-ts-3.0" src/launcher/app/build/outputs/apk/release/app-release.apk --repo "$GITHUB_REPOSITORY" --title "TV Home launcher 3.0 (com.ts.launcher)" --notes "CleanYourTV launcher 3.0 built with applicationId com.ts.launcher for the Xiaomi CN TV Home allowlist." || gh release upload "launcher-ts-3.0" src/launcher/app/build/outputs/apk/release/app-release.apk --repo "$GITHUB_REPOSITORY" --clobber
