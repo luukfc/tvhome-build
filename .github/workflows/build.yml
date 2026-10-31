@@ -37,7 +37,8 @@ jobs:
         run: |
           echo "part lengths: ${#KEYSTORE_B64_1} ${#KEYSTORE_B64_2} ${#KEYSTORE_B64_3}"
           printf '%s%s%s' "$KEYSTORE_B64_1" "$KEYSTORE_B64_2" "$KEYSTORE_B64_3" | base64 -d > "$RUNNER_TEMP/launcher-signing.p12"
-          test "$(stat -c%s "$RUNNER_TEMP/launcher-signing.p12")" = "2644"
+          echo "keystore sha256: $(sha256sum "$RUNNER_TEMP/launcher-signing.p12" | cut -d' ' -f1)"
+          test "$(sha256sum "$RUNNER_TEMP/launcher-signing.p12" | cut -d' ' -f1)" = "df322eb36a0271f596a2b921d22e4baf04b0da3751ad3d186aa34c69a64e46d8"
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$APKSIGNER" sign --ks "$RUNNER_TEMP/launcher-signing.p12" --ks-type PKCS12 --ks-pass "pass:$KEYSTORE_PASSWORD" --key-pass "pass:$KEY_PASSWORD" --ks-key-alias "$KEY_ALIAS" src/launcher/app/build/outputs/apk/release/app-release.apk
           "$APKSIGNER" verify --print-certs src/launcher/app/build/outputs/apk/release/app-release.apk
