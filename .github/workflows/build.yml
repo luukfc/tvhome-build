@@ -26,6 +26,17 @@ jobs:
           cd src/launcher
           chmod +x gradlew
           ./gradlew assembleRelease -PlauncherApplicationId=com.ts.launcher --no-daemon
+      - name: Sign APK with fixed signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/launcher-signing.p12"
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/launcher-signing.p12" --ks-type PKCS12 --ks-pass "pass:$KEYSTORE_PASSWORD" --key-pass "pass:$KEY_PASSWORD" --ks-key-alias "$KEY_ALIAS" src/launcher/app/build/outputs/apk/release/app-release.apk
+          "$APKSIGNER" verify --print-certs src/launcher/app/build/outputs/apk/release/app-release.apk
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
