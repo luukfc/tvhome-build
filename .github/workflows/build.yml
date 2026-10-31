@@ -15,6 +15,7 @@ jobs:
         with:
           repository: Gathin23/cleanyourtv
           path: src
+          ref: v3.2.0
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -34,4 +35,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "launcher-ts-3.0" src/launcher/app/build/outputs/apk/release/app-release.apk --repo "$GITHUB_REPOSITORY" --title "TV Home launcher 3.0 (com.ts.launcher)" --notes "CleanYourTV launcher 3.0 built with applicationId com.ts.launcher for the Xiaomi CN TV Home allowlist." || gh release upload "launcher-ts-3.0" src/launcher/app/build/outputs/apk/release/app-release.apk --repo "$GITHUB_REPOSITORY" --clobber
+          gh release create "launcher-ts-3.2" src/launcher/app/build/outputs/apk/release/app-release.apk --repo "$GITHUB_REPOSITORY" --title "TV Home launcher 3.2 (com.ts.launcher)" --notes "CleanYourTV launcher 3.2 built with applicationId com.ts.launcher for the Xiaomi CN TV Home allowlist." || gh release upload "launcher-ts-3.2" src/launcher/app/build/outputs/apk/release/app-release.apk --repo "$GITHUB_REPOSITORY" --clobber
